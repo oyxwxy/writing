@@ -230,6 +230,12 @@ textarea{width:100%;min-height:120px;padding:11px 12px;resize:vertical;line-heig
 .fa .sec{margin:16px 0 8px;padding:14px 0 0}
 .fa textarea{min-height:120px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;letter-spacing:0}
 .fa .ly{cursor:default}
+.shv{position:fixed;inset:0;z-index:60;background:#0b0b0cf2;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom))}
+.shv img{max-width:100%;max-height:64vh;max-height:64dvh;object-fit:contain;border-radius:8px;box-shadow:0 12px 40px #000a;-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto}
+.shv p{color:#ffffffd0;text-align:center;font-size:14px;line-height:1.65;margin:0}.shv p b{color:#fff}
+.shv .shb{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.shv button{min-height:44px;padding:0 18px;border-radius:12px;background:#ffffff1f;color:#fff;font-weight:600}.shv button:hover{background:#ffffff2e}
+.shv button.pri{background:#fff;color:#111}
 </style></head><body>
 <header>
 <div class="hl"><span class="lg">글결</span><button class="dt" id="dt" data-a="vault" title="작업 보관함 열기">새 작업</button></div>
@@ -698,11 +704,11 @@ function act(a,el,ev){const o=cur();const[k,v]=a.split(':');if(ED&&!['col','s-',
 
 const IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform=='MacIntel'&&navigator.maxTouchPoints>1);
 function showImg(b){const u=URL.createObjectURL(b),f=new File([b],'글결.png',{type:'image/png'}),can=!!(navigator.canShare&&navigator.canShare({files:[f]}));
- const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:50;background:#000d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;padding-top:max(16px,env(safe-area-inset-top));padding-bottom:max(16px,env(safe-area-inset-bottom))';
- d.innerHTML=`<img src="${u}" style="max-width:100%;max-height:66%;object-fit:contain;border-radius:6px;-webkit-touch-callout:default;-webkit-user-select:auto">
- <p style="color:#fff;text-align:center;font-size:14px;line-height:1.6">${can?'아래 버튼 → <b>이미지 저장</b>을 고르세요.<br>':''}또는 이미지를 <b>길게 눌러 “사진에 추가”</b>를 누르세요.</p>
- <div style="display:flex;gap:8px">${can?'<button class="pri" id="shb" style="padding:10px 16px">사진에 저장 · 공유</button>':''}<button id="clb" style="padding:10px 16px">닫기</button></div>`;
- document.body.appendChild(d);d.querySelector('#clb').onclick=()=>{d.remove();URL.revokeObjectURL(u)};
+ const d=document.createElement('div');d.className='shv';
+ d.innerHTML=`<img src="${u}" alt="저장할 이미지"><p>${can?'<b>사진에 저장</b>을 누른 뒤 공유 창에서 <b>“이미지 저장”</b>을 고르세요.<br>':''}이미지를 <b>길게 눌러 “사진 앱에 저장”</b>해도 돼요.</p>
+ <div class="shb">${can?'<button class="pri" id="shb">사진에 저장</button>':''}<button id="dlb">파일로 저장</button><button id="clb">닫기</button></div>`;
+ document.body.appendChild(d);const close=()=>{d.remove();URL.revokeObjectURL(u)};
+ d.querySelector('#clb').onclick=close;d.querySelector('#dlb').onclick=()=>dl(b,'글결.png');
  const sb=d.querySelector('#shb');if(sb)sb.onclick=()=>navigator.share({files:[f]}).catch(()=>{})}
 function dl(b,n){const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1e3)}
 $('#file').onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(t=>{try{restore(t);curWork=null;commit()}catch(x){alert('불러올 수 없는 파일이에요. 글결에서 저장한 .json 파일을 선택하세요.')}});e.target.value=''};
